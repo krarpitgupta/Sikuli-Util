@@ -1,0 +1,323 @@
+Imports Microsoft.Office.Interop.Excel
+Imports Microsoft.Office.Interop
+
+Public Class GEQTP_Lib
+
+
+    'Dim _JarFilePath As String = String.Empty
+    Dim _ExcelSheetName As String = String.Empty
+    Dim _ExcelFilePath As String = String.Empty
+    Dim _DataRow As Integer
+    Dim _JarFilePath As String = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\Crest\GELibEXE\GEQTP.jar"
+
+
+
+    Public Sub New()
+        If Not System.IO.File.Exists(_JarFilePath) Then
+            Throw New Exception("JarFile GEQTP.jar not found at " & vbCrLf &
+                                _JarFilePath)
+        End If
+    End Sub
+
+
+    Public Sub DataPoolPath(ByVal ExcelFilePath As String, ByVal ExcelSheetName As String, ByVal DataRow As Integer)
+        _ExcelSheetName = ExcelSheetName
+        _ExcelFilePath = ExcelFilePath
+        _DataRow = DataRow
+    End Sub
+
+
+
+    Public Function ReturnExcelData(ByVal ColumnName As String) As String
+
+        Dim objExcel As Microsoft.Office.Interop.Excel.Application
+        Dim objExcelWorkBook As Microsoft.Office.Interop.Excel.Workbook
+        Dim objExcelWorkSheet As Microsoft.Office.Interop.Excel.Worksheet
+        Dim FetchedExcelData As String = String.Empty
+
+        objExcel = New Excel.Application
+        objExcelWorkBook = objExcel.Workbooks.Open(_ExcelFilePath, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                        Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                        Type.Missing, Type.Missing, Type.Missing, True)
+        objExcel.DisplayAlerts = False
+        objExcelWorkSheet = objExcelWorkBook.Worksheets(_ExcelSheetName)
+        Dim usedRange As Excel.Range = objExcelWorkSheet.UsedRange
+        Dim ActualColID As Integer
+
+        'Search for column
+
+        Dim val1 As String
+        For i = 1 To usedRange.Columns.Count
+            val1 = objExcelWorkSheet.Cells(1, i).Value2
+            If ColumnName = val1 Then
+                ActualColID = i
+            End If
+        Next
+        Dim val As String
+        val = objExcelWorkSheet.Cells(_DataRow, ActualColID).Value2
+        If Not IsNothing(val) Then
+            FetchedExcelData = val
+        Else
+            FetchedExcelData = ""
+        End If
+
+        objExcelWorkBook.Close()
+        objExcel.Quit()
+        objExcel.DisplayAlerts = False
+        KillExcel()
+
+        Return (FetchedExcelData)
+
+    End Function
+
+    Sub KillExcel()
+        For Each proc In System.Diagnostics.Process.GetProcessesByName("EXCEL")
+            If proc.MainWindowTitle.Trim() = "" Then
+                proc.Kill()
+            End If
+        Next
+    End Sub
+
+
+
+
+
+    Public Function Method_DoubleClick(ByVal ImageName As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        'Dim testmsg As Integer
+        'testmsg = MsgBox("Click to test", 1, "Test message")
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """doubleClick""" & " " & """" & ImageName & ".png" & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """doubleClick""" & " " & """" & ImagePath & """", 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_ExactdoubleClick(ByVal ImageName As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        'Dim testmsg As Integer
+        'testmsg = MsgBox("Click to test", 1, "Test message")
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exactdoubleClick""" & " " & """" & ComplPath & ".png" & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exactdoubleClick""" & " " & """" & ImagePath & """", 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_Click(ByVal ImageName As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """click""" & " " & """" & ComplPath & ".png" & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """click""" & " " & """" & ImagePath & """", 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_ExactClick(ByVal ImageName As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exactClick""" & " " & """" & ComplPath & ".png" & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exactClick""" & " " & """" & ImagePath & """", 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_ExactRightClick(ByVal ImageName As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """rightClick""" & " " & """" & ComplPath & ".png" & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exactrightClick""" & " " & """" & ImagePath & """", 0, True)
+
+        Return (True)
+    End Function
+    Public Function Method_RightClick(ByVal ImageName As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """rightClick""" & " " & """" & ComplPath & ".png" & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """rightClick""" & " " & """" & ImagePath & ".png" & """", 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_switchApp(ByVal WindowTitle As String) As Boolean
+
+        Dim oShell As Object
+
+        oShell = CreateObject("Wscript.shell")
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """switchApp""" & " " & """" & WindowTitle & """", 0, True)
+
+        Return (True)
+    End Function
+
+
+    Public Function Method_hover(ByVal ImageName As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """hover""" & " " & """" & ComplPath & ".png" & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """hover""" & " " & """" & ImagePath & """", 0, True)
+
+        Return (True)
+    End Function
+
+
+    Public Function Method_dragDrop(ByVal ImageName1 As String, ByVal ImageName2 As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath1 As String = String.Empty
+        Dim ComplPath1 As String = String.Empty
+        Dim ImagePath2 As String = String.Empty
+        Dim ComplPath2 As String = String.Empty
+
+        ImagePath1 = ReturnExcelData(ImageName1)
+        'ComplPath1 = ImagePath1 & "\" & ImageName1
+
+        ImagePath2 = ReturnExcelData(ImageName2)
+        'ComplPath2 = ImagePath2 & "\" & ImageName2
+
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """dragDrop""" & " " & """" & ComplPath1 & ".png" & """" & " " & """" & ComplPath2 & ".png", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """dragDrop""" & " " & """" & ImagePath1 & """" & " " & """" & ImagePath2, 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_ExactdragDrop(ByVal ImageName1 As String, ByVal ImageName2 As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath1 As String = String.Empty
+        'Dim ComplPath1 As String = String.Empty
+        Dim ImagePath2 As String = String.Empty
+        'Dim ComplPath2 As String = String.Empty
+
+        ImagePath1 = ReturnExcelData(ImageName1)
+        'ComplPath1 = ImagePath1 & "\" & ImageName1
+
+        ImagePath2 = ReturnExcelData(ImageName2)
+        'ComplPath2 = ImagePath2 & "\" & ImageName2
+
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exactdragDrop""" & " " & """" & ComplPath1 & ".png" & """" & " " & """" & ComplPath2 & ".png", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exactdragDrop""" & " " & """" & ImagePath1 & """" & " " & """" & ImagePath2, 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_Type(ByVal ImageName As String, ByVal Text As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+
+        oShell = CreateObject("Wscript.shell")
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """type""" & " " & """" & ImagePath & """" & " " & """" & Text & """", 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_ExactType(ByVal ImageName As String, ByVal Text As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exacttype""" & " " & """" & ComplPath & ".png" & """" & " " & """" & Text & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exacttype""" & " " & """" & ImagePath & """" & " " & """" & Text & """", 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_Exists(ByVal ImageName As String, ByVal Tolerance As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exists""" & " " & """" & ComplPath & ".png" & """" & " " & """" & Tolerance & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exists""" & " " & """" & ImagePath & """" & " " & """" & Tolerance & """", 0, True)
+
+        Return (True)
+    End Function
+
+
+    Public Function Method_Exactexists(ByVal ImageName As String) As Boolean
+
+        Dim oShell As Object
+        Dim ImagePath As String = String.Empty
+        Dim ComplPath As String = String.Empty
+        ImagePath = ReturnExcelData(ImageName)
+        'ComplPath = ImagePath & "\" & ImageName
+
+        oShell = CreateObject("Wscript.shell")
+        'oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exactexists""" & " " & """" & ComplPath & ".png" & """", 0, True)
+        oShell.run("cmd /c java -jar " & """" & _JarFilePath & """" & " " & """exactexists""" & " " & """" & ImagePath & """", 0, True)
+
+        Return (True)
+    End Function
+
+    Public Function Method_ReadDataFromResultFile(ByVal OutPutSheetPath As String) As String
+
+        Dim fso, f, ts
+        Dim retstring As String = String.Empty
+
+        Const ForReading = 1
+        Const TristateUseDefault = -2
+
+        fso = CreateObject("Scripting.FileSystemObject")
+        f = fso.GetFile(OutPutSheetPath)
+        ts = f.OpenAsTextStream(ForReading, TristateUseDefault)
+
+        Do While ts.AtEndOfStream <> True
+            retstring = ts.ReadLine
+        Loop
+
+        ts.Close()
+
+        Return (retstring)
+
+    End Function
+
+
+End Class

@@ -1,0 +1,98 @@
+/***********************************************************************************
+		 * Function Name : ValidateImageExists
+		 * Description   : Function is to validate inherited/forced context menu existence.
+		 * Arguments     : imageLogicalName[inherited/forced], tolerance[0.99/0.95]
+		 * Return Value  : true/false
+		 *********************************************************************************** 
+		 */
+		public bool ValidateImageExists(string imageLogicalName, string tolerance)
+		{
+			ExcelSpecificTasks ExcelSpecificTasks_Instance = new ExcelSpecificTasks();
+			string imagePath = ExcelSpecificTasks_Instance.ReturnExcelData(imageLogicalName);
+			string programFilesPath = string.Empty;
+			bool statusFlag = false;
+			
+			programFilesPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles);
+			
+			var repo = ApplicationObjects.Instance;
+			var sContextMenu = repo.sContextMenu;
+
+			if(sContextMenu.SelfInfo.Exists())
+			{
+				string  jarFilePath = programFilesPath +@"\Crest\GELibEXE\GEQTP.jar";
+				tolerance = @"""" + tolerance + @"""";
+				ProcessStartInfo info = new ProcessStartInfo("cmd.exe");
+				
+				string tempString =  @""""+ jarFilePath +@"""" +" "+  @"""exists""" +" "+ @""""+ imagePath +@""""+" "+ @"""" + tolerance + @"""";
+				tempString= "/c java -jar "+ tempString;
+				info.Arguments = tempString;
+				info.WindowStyle = ProcessWindowStyle.Hidden;
+				Process p = new Process();
+				p = Process.Start(info);
+				p.WaitForExit();
+				if(!p.HasExited)
+					p.Kill();
+				//----- to read text file
+				string tempStatus = System.IO.File.ReadAllText(@"c:\TempResult.txt");
+				
+				if(tempStatus.ToLower().Trim().Equals("notexist"))
+				{
+					statusFlag = false;
+				}
+				else
+				{
+					statusFlag = true;
+				}
+			}
+			else
+			{
+				Report.Warn("Context Menu(Inherited/Forced) does not appear");
+				Report.Screenshot();
+			}
+			return statusFlag;
+		}
+
+
+
+
+		/***********************************************************************************
+		 * Function Name : GetImageCount
+		 * Description   : Function is to get the count of Image 
+		 * Arguments     : imageLogicalName[inherited/forced], tolerance[0.99/0.95]
+		 * Return Value  : true/false
+		 *********************************************************************************** 
+		 */
+		public int GetImageCount(string imageLogicalName)
+		{
+			ExcelSpecificTasks ExcelSpecificTasks_Instance = new ExcelSpecificTasks();
+			string imagePath = ExcelSpecificTasks_Instance.ReturnExcelData(imageLogicalName);
+			string programFilesPath = string.Empty;
+			int countOfImage = 0;
+			programFilesPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles);
+			var repo = ApplicationObjects.Instance;
+			var sContextMenu = repo.sContextMenu;
+			string  jarFilePath = programFilesPath +@"\Crest\GELibEXE\GEQTP.jar";
+			ProcessStartInfo info = new ProcessStartInfo("cmd.exe");
+			
+			string tempString =  @""""+ jarFilePath +@"""" +" "+  @"""findall""" +" "+ @""""+ imagePath +@"""";
+			tempString= "/c java -jar "+ tempString;
+			info.Arguments = tempString;
+			info.WindowStyle = ProcessWindowStyle.Hidden;
+			Process p = new Process();
+			p = Process.Start(info);
+			p.WaitForExit();
+			if(!p.HasExited)
+				p.Kill();
+			//----- to read text file
+			string tempStatus = System.IO.File.ReadAllText(@"c:\TempResult.txt");
+			if(!(tempStatus.ToLower().Trim().Contains("image not found")))
+			{
+				countOfImage = Convert.ToInt32(tempStatus);
+			}
+			else
+			{
+				countOfImage = 0;
+			}
+			
+			return countOfImage;
+		}
